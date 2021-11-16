@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  # Creating a postgres database with migration tables
+  db:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    volumes:
+      - ${PWD}/migrations/data:/var/lib/postgresql/data
+      - ${PWD}/migrations/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+#      - ${PWD}/migrations/sql/fill_relations.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+
+  # Web interface with adminer for database administration
+  adminer:
+    image: adminer:latest
+    restart: always
+    container_name: db-admin
+    environment:
+      ADMINER_DESIGN: flat
+    ports:
+      - "8080:8080"
